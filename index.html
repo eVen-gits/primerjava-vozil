@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Koliko stane kilometer</title>
+<meta name="description" content="Koliko kilometrov dobite za 100 € in koliko vas stane kilometer z izgubo vrednosti – za avte, prodane v Sloveniji, ali uvožene iz EU.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="style.css?v=4">
+</head>
+<body>
+<header class="top">
+  <h1>Koliko stane kilometer?</h1>
+  <p class="lead">Izberite avto, gorivo in kako ga boste vozili. Izračun pokaže, koliko kilometrov dobite za 100 € – samo za gorivo ali elektriko in skupaj z izgubo vrednosti avta. Avte lahko primerjate med seboj.</p>
+</header>
+
+<main>
+  <section class="panel" aria-labelledby="h-use">
+    <h2 id="h-use">Vaša vožnja</h2>
+    <div class="grid2">
+      <label>Prevoženih km na leto
+        <input type="number" id="kmYear" name="kmYear" min="1000" step="1000" inputmode="numeric" value="15000">
+      </label>
+      <label>Koliko let boste imeli avto
+        <input type="number" id="years" name="years" min="1" max="20" step="1" inputmode="numeric" value="5">
+      </label>
+    </div>
+  </section>
+
+  <div class="layout">
+    <section aria-labelledby="h-cars">
+      <h2 id="h-cars" class="sr">Avti</h2>
+      <div id="cars"></div>
+      <button type="button" id="addCar" class="add">+ Dodaj avto za primerjavo</button>
+    </section>
+    <section aria-labelledby="h-res" class="panel results">
+      <h2 id="h-res">Primerjava</h2>
+      <div id="results"></div>
+    </section>
+  </div>
+
+  <details class="panel" id="pricesPanel">
+    <summary><h2>Cene goriv in elektrike</h2></summary>
+    <p class="hint">Cene veljajo za vse avte. Spremenite jih, če točite drugje ali imate drugačno tarifo.</p>
+    <div id="prices" class="grid2"></div>
+  </details>
+
+  <details class="panel" id="viri">
+    <summary><h2>Viri in metoda</h2></summary>
+    <div id="sources"></div>
+  </details>
+</main>
+
+<footer class="foot">Izdelal <a href="https://egejvencelj.com" rel="noopener">Egej Vencelj · egejvencelj.com</a></footer>
+
+<datalist id="variants"></datalist>
+
+<template id="carTpl">
+  <article class="panel car">
+    <div class="car-head">
+      <h3 class="car-title">Avto</h3>
+      <button type="button" class="remove" aria-label="Odstrani avto">Odstrani</button>
+    </div>
+    <label>Znamka in model (ARSO, ADAC)
+      <input type="search" name="variant" list="variants" autocomplete="off" placeholder="npr. Octavia 2.0 TDI, Model 3, GR86 …">
+    </label>
+    <p class="hint match"></p>
+
+    <div class="grid2">
+      <label>Pogon
+        <select name="fuel">
+          <option value="b">Bencin</option>
+          <option value="d">Dizel</option>
+          <option value="lpg">Avtoplin (LPG)</option>
+          <option value="e">Elektrika</option>
+          <option value="hev">Hibrid (bencin)</option>
+          <option value="pb">Priključni hibrid (bencin)</option>
+          <option value="pd">Priključni hibrid (dizel)</option>
+        </select>
+      </label>
+      <label class="f-fuel">Gorivo
+        <select name="fuelKind"></select>
+      </label>
+      <label class="f-fuel">Poraba (l/100 km)
+        <input type="number" name="lit" min="0" step="0.1" inputmode="decimal">
+      </label>
+      <label class="f-el">Polnjenje
+        <select name="elKind"></select>
+      </label>
+      <label class="f-el">Poraba elektrike (kWh/100 km)
+        <input type="number" name="kwh" min="0" step="0.1" inputmode="decimal">
+      </label>
+      <label class="f-phev">Delež km na elektriko (%)
+        <input type="number" name="evShare" min="0" max="100" step="5" inputmode="numeric">
+      </label>
+    </div>
+
+    <fieldset class="buy">
+      <legend>Nakup</legend>
+      <div class="seg" role="radiogroup" aria-label="Kje kupite">
+        <label><input type="radio" value="si" checked> V Sloveniji</label>
+        <label><input type="radio" value="eu"> Uvoz iz EU</label>
+      </div>
+      <div class="grid2">
+        <label>Starost ob nakupu (let)
+          <input type="number" name="age" min="0" max="30" step="1" inputmode="numeric">
+        </label>
+        <label>Kupnina (€)
+          <input type="number" name="price" min="0" step="100" inputmode="numeric">
+        </label>
+      </div>
+      <p class="hint market"></p>
+      <label>Tržni podatki za izgubo vrednosti
+        <select name="curve"></select>
+      </label>
+      <div class="grid2">
+        <label><span class="resale-label">Vrednost ob prodaji (€)</span>
+          <input type="number" name="resale" min="0" step="100" inputmode="numeric">
+        </label>
+        <label class="f-eu">Cene v SLO glede na Nemčijo (%)
+          <input type="number" name="ratio" min="50" max="200" step="1" inputmode="numeric">
+        </label>
+      </div>
+      <div class="dep-src"></div>
+
+      <div class="f-eu import">
+        <h4>Stroški uvoza</h4>
+        <div class="grid2">
+          <label class="f-fuel">Izpust CO2 (g/km)
+            <input type="number" name="co2" min="0" step="1" inputmode="numeric">
+          </label>
+          <label class="f-fuel">Meritev CO2
+            <select name="co2Type"><option value="wltp">WLTP</option><option value="nedc">NEDC (starejši avti)</option></select>
+          </label>
+          <label class="f-fuel">Emisijski razred
+            <select name="euro"></select>
+          </label>
+          <label>Prevoz (€)
+            <input type="number" name="transport" min="0" step="50" inputmode="numeric">
+          </label>
+          <label>Registracija (€)
+            <input type="number" name="registration" min="0" step="5" inputmode="numeric">
+          </label>
+        </div>
+        <label class="check"><input type="checkbox" name="newVat"> Novo vozilo (do 6 mesecev ali do 6.000 km): DDV 22 % plačate v Sloveniji, kupnino vpišite brez DDV</label>
+        <table class="breakdown"></table>
+      </div>
+    </fieldset>
+    <p class="mini" aria-live="polite"></p>
+  </article>
+</template>
+
+<script src="app.js?v=4"></script>
+</body>
+</html>
